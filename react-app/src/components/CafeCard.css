@@ -1,0 +1,134 @@
+.reco-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.reco-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: transparent;
+}
+
+.reco-card:hover .reco-card-image {
+  transform: scale(1.05);
+}
+
+.reco-card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.reco-card-no-image {
+  width: 100%;
+  height: 100%;
+  background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.reco-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.reco-rank {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--blue);
+  color: var(--yellow);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+/* Vibe Chips */
+.vibe-chip {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.2px;
+}
+
+.vibe-chip--wfc {
+  background: rgba(232, 240, 254, 0.92);
+  color: var(--blue);
+  border: 1px solid rgba(0, 71, 171, 0.15);
+}
+
+.vibe-chip--nongkrong {
+  background: rgba(255, 248, 220, 0.92);
+  color: #8b6914;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.vibe-chip--ngedate {
+  background: rgba(252, 228, 236, 0.92);
+  color: var(--pink);
+  border: 1px solid rgba(233, 30, 99, 0.15);
+}
+
+/* Card Body */
+.reco-card-body {
+  padding: 14px 16px 16px;
+}
+
+.reco-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.reco-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.match-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.reco-card-address {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+}
+
+.reco-card-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}

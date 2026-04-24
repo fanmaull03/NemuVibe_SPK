@@ -1,0 +1,119 @@
+/* ===== BOTTOM NAVIGATION ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 8px 8px 12px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 200;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  color: var(--gray-400);
+  transition: var(--transition);
+  position: relative;
+  min-width: 52px;
+}
+
+.nav-item:hover:not(.nav-item--locked) {
+  color: var(--blue);
+}
+
+.nav-item--active {
+  color: var(--blue) !important;
+}
+
+.nav-item--active::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: var(--blue);
+  border-radius: 0 0 3px 3px;
+}
+
+.nav-label {
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Center nav button (Cari) */
+.nav-item--center {
+  margin-top: -22px;
+}
+
+.nav-center-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue) 0%, #2563eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 71, 171, 0.3);
+  transition: var(--transition);
+}
+
+.nav-item--center:hover .nav-center-circle {
+  transform: scale(1.08);
+  box-shadow: 0 6px 25px rgba(0, 71, 171, 0.4);
+}
+
+.nav-item--center:active .nav-center-circle {
+  transform: scale(0.95);
+}
+
+.nav-label--center {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+/* Locked nav items */
+.nav-item--locked {
+  color: var(--gray-300) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.nav-icon-locked-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gray-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}

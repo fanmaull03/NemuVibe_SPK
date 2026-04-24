@@ -1,0 +1,126 @@
+/* =========================================
+   Search Page — NemuVibe
+   ========================================= */
+
+.search-page {
+  background: #fafbfd;
+  min-height: 100vh;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.search-header-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.search-header-form:focus-within {
+  background: var(--white);
+  border-color: var(--blue);
+  box-shadow: 0 4px 14px rgba(0,71,171,0.08);
+}
+
+.search-header-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--gray-800);
+  outline: none;
+  width: 100%;
+}
+
+.search-header-input::placeholder {
+  color: var(--gray-400);
+}
+
+.search-clear-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin-right: -8px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.search-clear-btn:hover {
+  background: var(--gray-200);
+}
+
+.search-main {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-results-meta {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+
+.search-results-meta strong {
+  font-weight: 800;
+  color: var(--gray-800);
+}
+
+.search-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-500);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.search-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.search-empty h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gray-800);
+  margin-bottom: 8px;
+}
+
+.search-empty p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  max-width: 260px;
+}
