@@ -99,13 +99,3 @@ Jika port/backend host berubah, sesuaikan nilai tersebut.
 - /recommendation: hasil rekomendasi
 - /admin, /admin/add, /admin/edit/:id: halaman admin
 
-## Troubleshooting
-
-- Error Missing script: dev
-	Kamu menjalankan npm run dev di folder yang salah. Pindah ke folder react-app dulu.
-
-- Backend gagal saat npm start
-	Di backend saat ini belum ada script start pada package.json. Gunakan node index.js.
-
-- CORS atau request gagal
-	Pastikan backend berjalan di port 5000 dan API base URL frontend sesuai.
