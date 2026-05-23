@@ -1,4 +1,15 @@
 {
+  "name": "nemuvibe",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix react-app",
+    "frontend": "npm run dev --prefix react-app",
+    "frontend:build": "npm run build --prefix react-app",
+    "frontend:preview": "npm run preview --prefix react-app",
+    "backend": "npm run dev --prefix backend",
+    "backend:start": "npm run start --prefix backend",
+    "start": "npm run backend:start"
+  },
   "dependencies": {
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",

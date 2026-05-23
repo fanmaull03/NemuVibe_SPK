@@ -87,6 +87,12 @@
   padding: 16px 20px 8px;
 }
 
+.ranking-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .ranking-subtitle {
   font-size: 1rem;
   font-weight: 700;
@@ -110,6 +116,11 @@
 }
 
 .filter-advanced-btn:hover { background: var(--gray-200); }
+
+.filter-advanced-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* Admin badge info */
 .ranking-badge-info {

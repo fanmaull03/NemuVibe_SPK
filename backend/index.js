@@ -168,34 +168,43 @@ app.get('/api/recommend/:category', async (req, res) => {
     const w = weightRes.rows[0];
 
     // 3. Hitung Skor SAW
-    // Rumus: V = (Skor/Max) * Bobot
-    const results = cafes.map(cafe => {
-      // Semua kriteria sekarang dianggap BENEFIT karena skor 5 selalu yang terbaik
-      const n1 = (cafe.c1_digital / 5) * w.w1_digital;
-      const n2 = (cafe.c2_harga / 5) * w.w2_harga; 
-      const n3 = (cafe.c3_suasana / 5) * w.w3_suasana;
-      const n4 = (cafe.c4_tenang / 5) * w.w4_tenang;
-      const n5 = (cafe.c5_hiburan / 5) * w.w5_hiburan;
-      const n6 = (cafe.c6_rasa / 5) * w.w6_rasa;
+    
+    // 3. Hitung Skor SAW dengan normalisasi yang benar
+const maxDigital  = Math.max(...cafes.map(c => c.c1_digital));
+const minHarga    = Math.min(...cafes.map(c => c.c2_harga));
+const maxSuasana  = Math.max(...cafes.map(c => c.c3_suasana));
+const maxTenang   = Math.max(...cafes.map(c => c.c4_tenang));
+const maxHiburan  = Math.max(...cafes.map(c => c.c5_hiburan));
+const maxRasa     = Math.max(...cafes.map(c => c.c6_rasa));
 
-      const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
+const results = cafes.map(cafe => {
+  const n1 = (cafe.c1_digital / maxDigital) * w.w1_digital;  // Benefit
+  const n2 = (minHarga / cafe.c2_harga)     * w.w2_harga;    // Cost
+  const n3 = (cafe.c3_suasana / maxSuasana) * w.w3_suasana;  // Benefit
+  const n4 = (cafe.c4_tenang  / maxTenang)  * w.w4_tenang;   // Benefit
+  const n5 = (cafe.c5_hiburan / maxHiburan) * w.w5_hiburan;  // Benefit
+  const n6 = (cafe.c6_rasa    / maxRasa)    * w.w6_rasa;     // Benefit
 
-      return {
-        id: cafe.id,
-        nama: cafe.nama,
-        alamat: cafe.alamat,
-        foto_utama: cafe.foto_utama,
-        kategori: cafe.kategori,
-        area: cafe.area,
-        c1_digital: cafe.c1_digital,
-        c2_harga: cafe.c2_harga,
-        c3_suasana: cafe.c3_suasana,
-        c4_tenang: cafe.c4_tenang,
-        c5_hiburan: cafe.c5_hiburan,
-        c6_rasa: cafe.c6_rasa,
-        skor_akhir: parseFloat(totalSkor.toFixed(4))
-      };
-    });
+   console.log(`${cafe.nama}: n1=${n1.toFixed(4)} n2=${n2.toFixed(4)} n3=${n3.toFixed(4)} n4=${n4.toFixed(4)} n5=${n5.toFixed(4)} n6=${n6.toFixed(4)}`);
+  const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
+
+
+  return {
+    id: cafe.id,
+    nama: cafe.nama,
+    alamat: cafe.alamat,
+    foto_utama: cafe.foto_utama,
+    kategori: cafe.kategori,
+    area: cafe.area,
+    c1_digital: cafe.c1_digital,
+    c2_harga: cafe.c2_harga,
+    c3_suasana: cafe.c3_suasana,
+    c4_tenang: cafe.c4_tenang,
+    c5_hiburan: cafe.c5_hiburan,
+    c6_rasa: cafe.c6_rasa,
+    skor_akhir: parseFloat(totalSkor.toFixed(4))
+  };
+});
 
     // 4. Urutkan dari skor tertinggi (Ranking)
     results.sort((a, b) => b.skor_akhir - a.skor_akhir);
@@ -226,15 +235,22 @@ app.post('/api/recommend/custom', async (req, res) => {
     const nw6 = w6 / totalW;
 
     // 3. Hitung Skor SAW dengan bobot kustom
-    const results = cafes.map(cafe => {
-      const n1 = (cafe.c1_digital / 5) * nw1;
-      const n2 = (cafe.c2_harga / 5) * nw2;
-      const n3 = (cafe.c3_suasana / 5) * nw3;
-      const n4 = (cafe.c4_tenang / 5) * nw4;
-      const n5 = (cafe.c5_hiburan / 5) * nw5;
-      const n6 = (cafe.c6_rasa / 5) * nw6;
+    const maxDigital  = Math.max(...cafes.map(c => c.c1_digital));
+const minHarga    = Math.min(...cafes.map(c => c.c2_harga));
+const maxSuasana  = Math.max(...cafes.map(c => c.c3_suasana));
+const maxTenang   = Math.max(...cafes.map(c => c.c4_tenang));
+const maxHiburan  = Math.max(...cafes.map(c => c.c5_hiburan));
+const maxRasa     = Math.max(...cafes.map(c => c.c6_rasa));
 
-      const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
+const results = cafes.map(cafe => {
+  const n1 = (cafe.c1_digital / maxDigital) * nw1;  // Benefit
+  const n2 = (minHarga / cafe.c2_harga)     * nw2;  // Cost
+  const n3 = (cafe.c3_suasana / maxSuasana) * nw3;  // Benefit
+  const n4 = (cafe.c4_tenang  / maxTenang)  * nw4;  // Benefit
+  const n5 = (cafe.c5_hiburan / maxHiburan) * nw5;  // Benefit
+  const n6 = (cafe.c6_rasa    / maxRasa)    * nw6;  // Benefit
+
+  const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
 
       return {
         id: cafe.id,

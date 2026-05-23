@@ -33,6 +33,7 @@ export default function Ranking() {
   const [cafes, setCafes]           = useState([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,8 +64,11 @@ export default function Ranking() {
       }
     };
     loadData();
-  }, [activeTab]);
+  }, [activeTab, refreshKey]);
 
+  const handleRefresh = () => {
+    setRefreshKey(key => key + 1);
+  };
   return (
     <div className="app-page">
       {/* Header */}
@@ -98,12 +102,27 @@ export default function Ranking() {
         {/* Subheader */}
         <section className="ranking-subheader">
           <h2 className="ranking-subtitle">Peringkat Global</h2>
-          <span className="ranking-badge-info">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M2 3.5h12M4 8h8M6 12.5h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            </svg>
-            Berdasarkan bobot admin
-          </span>
+          <div className="ranking-actions">
+            <span className="ranking-badge-info">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M2 3.5h12M4 8h8M6 12.5h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+              Berdasarkan bobot admin
+            </span>
+            <button
+              type="button"
+              className="filter-advanced-btn"
+              onClick={handleRefresh}
+              disabled={loading}
+              aria-label="Refresh ranking"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M13.5 3.5v4h-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13.2 7.5a5.5 5.5 0 10-1.1 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
         </section>
 
         {/* List */}

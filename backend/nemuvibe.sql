@@ -10,7 +10,7 @@ CREATE TABLE cafes (
     c6_rasa INT
 );
 
--- Masukkan data 9 cafe yang sudah kita bahas
+
 INSERT INTO cafes (nama, c1_digital, c2_harga, c3_suasana, c4_tenang, c5_hiburan, c6_rasa) VALUES
 ('Cold n Brew', 5, 2, 5, 5, 2, 5),
 ('At Cafe Campus', 5, 4, 3, 3, 2, 4),
