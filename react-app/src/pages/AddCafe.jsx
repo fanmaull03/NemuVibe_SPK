@@ -30,7 +30,7 @@ export default function AddCafe() {
     nama: '', alamat: '', jam_buka: '', jam_tutup: '', link_gmaps: '',
     kategori: '', area: '', keunggulan: '', foto_utama: '', galeri: '',
     is24jam: false,
-    c1_digital: 50, c2_harga: 50, c3_suasana: 50, c4_tenang: 50, c5_hiburan: 50, c6_rasa: 50
+    c1_digital: 3, c2_harga: 3, c3_suasana: 3, c4_tenang: 3, c5_hiburan: 3, c6_rasa: 3
   });
 
   // Foto utama: satu file
@@ -61,12 +61,12 @@ export default function AddCafe() {
         keunggulan: d.keunggulan || '',
         foto_utama: d.foto_utama || '', galeri: d.galeri || '',
         is24jam: is24,
-        c1_digital: (d.c1_digital / 5) * 100,
-        c2_harga:   (d.c2_harga / 5) * 100,
-        c3_suasana: (d.c3_suasana / 5) * 100,
-        c4_tenang:  (d.c4_tenang / 5) * 100,
-        c5_hiburan: (d.c5_hiburan / 5) * 100,
-        c6_rasa:    (d.c6_rasa / 5) * 100,
+        c1_digital: d.c1_digital || 3,
+        c2_harga:   d.c2_harga || 3,
+        c3_suasana: d.c3_suasana || 3,
+        c4_tenang:  d.c4_tenang || 3,
+        c5_hiburan: d.c5_hiburan || 3,
+        c6_rasa:    d.c6_rasa || 3,
       });
       if (d.foto_utama) setFotoUtamaPreview(d.foto_utama);
       if (d.galeri) {
@@ -182,8 +182,11 @@ export default function AddCafe() {
       }
       setTimeout(() => navigate('/admin'), 1000);
     } catch (err) {
-      console.error(err);
-      showToast('Gagal menyimpan data cafe');
+      console.error('Save error:', err);
+      console.error('Response status:', err.response?.status);
+      console.error('Response data:', err.response?.data);
+      const serverMsg = err.response?.data?.message || err.message || 'Unknown error';
+      showToast(`Gagal: ${serverMsg}`);
     } finally {
       setSaving(false);
       setUploading(false);
@@ -347,7 +350,7 @@ export default function AddCafe() {
               <span className="addcafe-section-icon">⚙️</span>
               Penilaian Kriteria (SAW)
             </h2>
-            <span className="addcafe-saw-badge">0 - 100</span>
+            <span className="addcafe-saw-badge">1 - 5</span>
           </div>
           <p className="addcafe-section-desc">Geser slider untuk menentukan nilai kriteria cafe.</p>
 
@@ -357,17 +360,17 @@ export default function AddCafe() {
                 <div className="addcafe-criteria-top">
                   <span className="addcafe-criteria-icon">{c.icon}</span>
                   <span className="addcafe-criteria-label">{c.label}</span>
-                  <span className="addcafe-criteria-value" style={{ color: form[c.key] > 70 ? '#0047AB' : form[c.key] > 40 ? '#B8860B' : '#9CA3AF' }}>
+                  <span className="addcafe-criteria-value" style={{ color: form[c.key] >= 4 ? '#0047AB' : form[c.key] >= 3 ? '#B8860B' : '#9CA3AF' }}>
                     {form[c.key]}
                   </span>
                 </div>
                 <input
                   type="range"
-                  min="0" max="100" step="5"
+                  min="1" max="5" step="1"
                   value={form[c.key]}
                   onChange={e => handleSlider(c.key, e.target.value)}
                   className="addcafe-range"
-                  style={{ '--pct': `${form[c.key]}%` }}
+                  style={{ '--pct': `${((form[c.key] - 1) / 4) * 100}%` }}
                 />
               </div>
             ))}

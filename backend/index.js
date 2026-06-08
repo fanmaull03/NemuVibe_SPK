@@ -66,7 +66,7 @@ app.post('/api/auth/register', async (req, res) => {
     // 4. Inisialisasi default preferences (Bobot 6 kriteria untuk user tersebut)
     // Nilai default 0.16 agar totalnya mendekati 1.0 (100%)
     await pool.query(
-      'INSERT INTO user_preferences (user_id, w1_digital, w2_harga, w3_suasana, w4_tenang, w5_hiburan, w6_rasa) VALUES ($1, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16)',
+      'INSERT INTO user_preferences (user_id, w1_digital, w2_harga, w3_suasana, w4_tenang, w5_hiburan, w6_rasa) VALUES ($1, 0.20, 0.16, 0.16, 0.16, 0.16, 0.16)',
       [userId]
     );
 
@@ -178,12 +178,21 @@ const maxHiburan  = Math.max(...cafes.map(c => c.c5_hiburan));
 const maxRasa     = Math.max(...cafes.map(c => c.c6_rasa));
 
 const results = cafes.map(cafe => {
-  const n1 = (cafe.c1_digital / maxDigital) * w.w1_digital;  // Benefit
-  const n2 = (minHarga / cafe.c2_harga)     * w.w2_harga;    // Cost
-  const n3 = (cafe.c3_suasana / maxSuasana) * w.w3_suasana;  // Benefit
-  const n4 = (cafe.c4_tenang  / maxTenang)  * w.w4_tenang;   // Benefit
-  const n5 = (cafe.c5_hiburan / maxHiburan) * w.w5_hiburan;  // Benefit
-  const n6 = (cafe.c6_rasa    / maxRasa)    * w.w6_rasa;     // Benefit
+  // 3a. Normalisasi matriks keputusan (R)
+  const r1 = maxDigital > 0 ? cafe.c1_digital / maxDigital : 0; // Benefit
+  const r2 = (minHarga > 0 && cafe.c2_harga > 0) ? minHarga / cafe.c2_harga : 0; // Cost
+  const r3 = maxSuasana > 0 ? cafe.c3_suasana / maxSuasana : 0; // Benefit
+  const r4 = maxTenang > 0 ? cafe.c4_tenang / maxTenang : 0; // Benefit
+  const r5 = maxHiburan > 0 ? cafe.c5_hiburan / maxHiburan : 0; // Benefit
+  const r6 = maxRasa > 0 ? cafe.c6_rasa / maxRasa : 0; // Benefit
+
+  // 3b. Bobotkan hasil normalisasi
+  const n1 = r1 * w.w1_digital;
+  const n2 = r2 * w.w2_harga;
+  const n3 = r3 * w.w3_suasana;
+  const n4 = r4 * w.w4_tenang;
+  const n5 = r5 * w.w5_hiburan;
+  const n6 = r6 * w.w6_rasa;
 
    console.log(`${cafe.nama}: n1=${n1.toFixed(4)} n2=${n2.toFixed(4)} n3=${n3.toFixed(4)} n4=${n4.toFixed(4)} n5=${n5.toFixed(4)} n6=${n6.toFixed(4)}`);
   const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
@@ -243,12 +252,21 @@ const maxHiburan  = Math.max(...cafes.map(c => c.c5_hiburan));
 const maxRasa     = Math.max(...cafes.map(c => c.c6_rasa));
 
 const results = cafes.map(cafe => {
-  const n1 = (cafe.c1_digital / maxDigital) * nw1;  // Benefit
-  const n2 = (minHarga / cafe.c2_harga)     * nw2;  // Cost
-  const n3 = (cafe.c3_suasana / maxSuasana) * nw3;  // Benefit
-  const n4 = (cafe.c4_tenang  / maxTenang)  * nw4;  // Benefit
-  const n5 = (cafe.c5_hiburan / maxHiburan) * nw5;  // Benefit
-  const n6 = (cafe.c6_rasa    / maxRasa)    * nw6;  // Benefit
+  // 3a. Normalisasi matriks keputusan (R)
+  const r1 = maxDigital > 0 ? cafe.c1_digital / maxDigital : 0; // Benefit
+  const r2 = (minHarga > 0 && cafe.c2_harga > 0) ? minHarga / cafe.c2_harga : 0; // Cost
+  const r3 = maxSuasana > 0 ? cafe.c3_suasana / maxSuasana : 0; // Benefit
+  const r4 = maxTenang > 0 ? cafe.c4_tenang / maxTenang : 0; // Benefit
+  const r5 = maxHiburan > 0 ? cafe.c5_hiburan / maxHiburan : 0; // Benefit
+  const r6 = maxRasa > 0 ? cafe.c6_rasa / maxRasa : 0; // Benefit
+
+  // 3b. Bobotkan hasil normalisasi
+  const n1 = r1 * nw1;
+  const n2 = r2 * nw2;
+  const n3 = r3 * nw3;
+  const n4 = r4 * nw4;
+  const n5 = r5 * nw5;
+  const n6 = r6 * nw6;
 
   const totalSkor = n1 + n2 + n3 + n4 + n5 + n6;
 
@@ -312,25 +330,32 @@ app.get('/api/cafes/:id', async (req, res) => {
 
 // --- ADMIN: Tambah Cafe Baru ---
 app.post('/api/cafes', authenticate, adminOnly, async (req, res) => {
-  console.log("Data masuk dari Frontend:", req.body);
+  console.log("=== POST /api/cafes ===");
+  console.log("Data masuk dari Frontend:", JSON.stringify(req.body, null, 2));
 
   const { nama, alamat, jam_buka, jam_tutup, link_gmaps, kategori, area, keunggulan, foto_utama, galeri, c1_digital, c2_harga, c3_suasana, c4_tenang, c5_hiburan, c6_rasa } = req.body;
   try {
-    const toScale5 = (val) => Math.max(1, Math.min(5, Math.round((val / 100) * 5)));
+    const clamp = (val) => Math.max(1, Math.min(5, parseInt(val) || 3));
+    
+    const params = [nama, alamat || '', jam_buka || '', jam_tutup || '', link_gmaps || '',
+       kategori || '', area || '', keunggulan || '', foto_utama || '', galeri || '',
+       clamp(c1_digital), clamp(c2_harga), clamp(c3_suasana),
+       clamp(c4_tenang), clamp(c5_hiburan), clamp(c6_rasa)];
+    console.log("SQL params:", params);
     
     const newCafe = await pool.query(
       `INSERT INTO cafes (nama, alamat, jam_buka, jam_tutup, link_gmaps, kategori, area, keunggulan, foto_utama, galeri, c1_digital, c2_harga, c3_suasana, c4_tenang, c5_hiburan, c6_rasa)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING *`,
-      [nama, alamat || '', jam_buka || '', jam_tutup || '', link_gmaps || '',
-       kategori || '', area || '', keunggulan || '', foto_utama || '', galeri || '',
-       toScale5(c1_digital), toScale5(c2_harga), toScale5(c3_suasana),
-       toScale5(c4_tenang), toScale5(c5_hiburan), toScale5(c6_rasa)]
+      params
     );
+    console.log("INSERT OK:", newCafe.rows[0]);
     res.status(201).json(newCafe.rows[0]);
   } catch (err) {
-    console.error("ADA ERROR SQL NIH:", err.message);
-    res.status(500).json({ message: 'Gagal menambahkan cafe' });
+    console.error("=== ERROR POST /api/cafes ===");
+    console.error("Error message:", err.message);
+    console.error("Error stack:", err.stack);
+    res.status(500).json({ message: 'Gagal menambahkan cafe', error: err.message });
   }
 });
 
@@ -339,7 +364,7 @@ app.put('/api/cafes/:id', authenticate, adminOnly, async (req, res) => {
   const { id } = req.params;
   const { nama, alamat, jam_buka, jam_tutup, link_gmaps, kategori, area, keunggulan, foto_utama, galeri, c1_digital, c2_harga, c3_suasana, c4_tenang, c5_hiburan, c6_rasa } = req.body;
   try {
-    const toScale5 = (val) => Math.max(1, Math.min(5, Math.round((val / 100) * 5)));
+    const clamp = (val) => Math.max(1, Math.min(5, parseInt(val) || 3));
     
     const result = await pool.query(
       `UPDATE cafes SET nama=$1, alamat=$2, jam_buka=$3, jam_tutup=$4, link_gmaps=$5,
@@ -348,8 +373,8 @@ app.put('/api/cafes/:id', authenticate, adminOnly, async (req, res) => {
        WHERE id=$17 RETURNING *`,
       [nama, alamat || '', jam_buka || '', jam_tutup || '', link_gmaps || '',
        kategori || '', area || '', keunggulan || '', foto_utama || '', galeri || '',
-       toScale5(c1_digital), toScale5(c2_harga), toScale5(c3_suasana),
-       toScale5(c4_tenang), toScale5(c5_hiburan), toScale5(c6_rasa), id]
+       clamp(c1_digital), clamp(c2_harga), clamp(c3_suasana),
+       clamp(c4_tenang), clamp(c5_hiburan), clamp(c6_rasa), id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Cafe tidak ditemukan' });
@@ -392,10 +417,24 @@ app.put('/api/weights/:category', authenticate, adminOnly, async (req, res) => {
   const { category } = req.params;
   const { w1_digital, w2_harga, w3_suasana, w4_tenang, w5_hiburan, w6_rasa } = req.body;
   try {
+    const w1 = Number(w1_digital);
+    const w2 = Number(w2_harga);
+    const w3 = Number(w3_suasana);
+    const w4 = Number(w4_tenang);
+    const w5 = Number(w5_hiburan);
+    const w6 = Number(w6_rasa);
+    const weights = [w1, w2, w3, w4, w5, w6];
+    if (weights.some(n => Number.isNaN(n))) {
+      return res.status(400).json({ message: 'Bobot harus berupa angka.' });
+    }
+    const total = weights.reduce((sum, n) => sum + n, 0);
+    if (Math.abs(total - 1) > 0.001) {
+      return res.status(400).json({ message: 'Total bobot harus sama dengan 1.' });
+    }
     const result = await pool.query(
       `UPDATE weights SET w1_digital=$1, w2_harga=$2, w3_suasana=$3, w4_tenang=$4, w5_hiburan=$5, w6_rasa=$6
        WHERE nama_kategori=$7 RETURNING *`,
-      [w1_digital, w2_harga, w3_suasana, w4_tenang, w5_hiburan, w6_rasa, category]
+      [w1, w2, w3, w4, w5, w6, category]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Kategori tidak ditemukan' });
@@ -531,6 +570,23 @@ app.put('/api/user-preferences/:category', authenticate, async (req, res) => {
     console.error(err.message);
     res.status(500).json({ message: 'Gagal menyimpan preferensi' });
   }
+});
+
+// --- GLOBAL ERROR HANDLER (Express 5 + Multer 2 compatibility) ---
+app.use((err, req, res, next) => {
+  console.error('=== GLOBAL ERROR HANDLER ===');
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
+  
+  // Handle Multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File terlalu besar (max 5MB)' });
+  }
+  
+  res.status(err.status || 500).json({ 
+    message: err.message || 'Internal Server Error',
+    error: process.env.NODE_ENV === 'production' ? undefined : err.message
+  });
 });
 
 app.listen(PORT, () => {
